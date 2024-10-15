@@ -1,0 +1,121 @@
+name: salespro_admin
+description: A new Flutter project.
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+version: 1.0.0+5
+
+environment:
+  sdk: ">=2.19.3 <4.0.0"
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_localizations:
+    sdk: flutter
+
+
+
+  flutter_feather_icons:
+  font_awesome_flutter:
+  syncfusion_flutter_charts:
+  dotted_border:
+  flutter_simple_calculator:
+  url_strategy:
+  firebase_app_check:
+  flutter_riverpod:
+  firebase_database:
+  firebase_auth:
+  firebase_core: 2.17.0
+  flutter_easyloading:
+  fluttertoast: 8.0.9
+  cached_network_image:
+  simple_barcode_scanner:
+
+  printing:
+  http_auth:
+  http:
+  pinput:
+  auto_size_text:
+  date_time_format:
+  provider:
+  eventify:
+  image:
+  flag:
+  dropdown_button2:
+  firebase_storage:
+  image_picker:
+  nb_utils:
+  image_picker_web:
+  path_provider:
+  open_file:
+  google_fonts:
+  pdf:
+
+
+
+
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints:
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+
+    uses-material-design: true
+    assets:
+    - images/
+
+fonts:
+    - family: FontAwesomeSolid
+      fonts:
+        - asset: packages/font_awesome_flutter/fonts/fa-solid-900.ttf
+    - family: FontAwesomeBrands
+      fonts:
+        - asset: packages/font_awesome_flutter/fonts/fa-brands-400.ttf
+    - family: FeatherIcons
+      fonts:
+        - asset: packages/flutter_feather_icons/fonts/feather.ttf
+    - family: LineAwesome
+      fonts:
+        - asset: packages/nb_utils/fonts/LineAwesome.ttf
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
+flutter_intl:
+  enabled: true

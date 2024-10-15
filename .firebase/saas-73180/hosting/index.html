@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--
+      If you are serving your web app in a path other than the root, change the
+      href value below to reflect the base path you are serving from.
+
+      The path provided below has to start and end with a slash "/" in order for
+      it to work correctly.
+
+      Fore more details:
+      * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+    -->
+    <base href="/">
+
+    <meta charset="UTF-8">
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+    <meta name="description" content="A new Flutter project.">
+
+    <!-- iOS meta tags & icons -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Billing Software">
+    <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="jb.png" imagesizes="100"/>
+
+    <title>Billing Software</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+</head>
+<body>
+<!-- This script installs service_worker.js to provide PWA functionality to
+     application. For more information, see:
+     https://developers.google.com/web/fundamentals/primers/service-workers -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="js/payment.js"></script>
+<div id="recaptchaDOM"></div>
+
+<script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('flutter-first-frame', function () {
+        navigator.serviceWorker.register('flutter_service_worker.js?v=4051601159');
+      });
+    }
+  </script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js"></script>
+
+<script>
+            var firebaseConfig = {
+      apiKey: "AIzaSyDmao83PAnXXAFRr072ztz6u47PE9lSKF8",
+      authDomain: "saas-73180.firebaseapp.com",
+      databaseURL: "https://saas-73180-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "saas-73180",
+      storageBucket: "saas-73180.appspot.com",
+      messagingSenderId: "1019185740930",
+      appId: "1:1019185740930:web:1a43a551b8af660356889b",
+      measurementId: "G-GPL33XWTPK"
+            };
+
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+          </script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="js/payment.js"></script>
+<script type="text/javascript">
+  function openRazorpayCheckout(options) {
+    console.log("Razorpay Options Received:", options); // Debug log
+
+    if (!options.key) {
+      console.error("No key passed to Razorpay");
+      return;
+    }
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+  }
+</script>
+
+
+<!--<script>-->
+<!--  function openRazorpayCheckout() {-->
+<!--    var options = {-->
+<!--      "key": "rzp_live_LQpw9dfarShC9Z", // Enter the Key ID generated from Razorpay Dashboard-->
+<!--      "amount": "100", // Amount in paise-->
+<!--      "currency": "INR",-->
+<!--      "name": "JoinBills",-->
+<!--      "description": "Subscription",-->
+<!--      "handler": function (response){-->
+<!--          console.log(response.razorpay_payment_id);-->
+<!--      },-->
+<!--      "prefill": {-->
+<!--          "contact": "81198432",-->
+<!--          "email": "4ansjb@gmail.com"-->
+<!--      },-->
+<!--       'external': {-->
+<!--        'wallets': ['paytm']-->
+<!--      }-->
+<!--    };-->
+<!--    var rzp = new Razorpay(options);-->
+<!--    rzp.open();-->
+<!--  }-->
+<!--</script>-->
+
+
+<script src="main.dart.js" type="application/javascript"></script>
+</body>
+</html>
