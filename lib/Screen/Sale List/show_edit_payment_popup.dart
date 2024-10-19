@@ -43,12 +43,9 @@ class ShowEditPaymentPopUp extends StatefulWidget {
 
 class _ShowEditPaymentPopUpState extends State<ShowEditPaymentPopUp> {
   List<String> paymentItem = [
-    'Bank',
+    'Net Banking',
+    'UPI',
     'Due',
-    'B-kash',
-    'Nagad',
-    'Rocket',
-    'DBBL',
   ];
   String selectedPaymentOption = 'Bank';
 

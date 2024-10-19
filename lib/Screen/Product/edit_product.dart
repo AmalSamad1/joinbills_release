@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker_web/image_picker_web.dart';
+// import 'package:image_picker_web/image_picker_web.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:salespro_admin/Screen/Product/product.dart';
 import 'package:salespro_admin/Screen/Widgets/Constant%20Data/button_global.dart';
@@ -49,8 +50,6 @@ class _AddProductState extends State<EditProduct> {
   String productPicture = '';
 
   Uint8List? image;
-
-
 
   Future<void> uploadFile() async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -94,14 +93,14 @@ class _AddProductState extends State<EditProduct> {
     }
   }
 
-
   TextEditingController productNameController = TextEditingController();
+  TextEditingController productUnitController = TextEditingController();
   TextEditingController productSalePriceController = TextEditingController();
   TextEditingController productPurchasePriceController = TextEditingController();
   TextEditingController productDiscountPriceController = TextEditingController();
   TextEditingController productWholesalePriceController = TextEditingController();
   TextEditingController productDealerPriceController = TextEditingController();
-  TextEditingController productgstType = TextEditingController();
+  TextEditingController productManufacturerController = TextEditingController();
 
   TextEditingController sizeController = TextEditingController();
   TextEditingController colorController = TextEditingController();
@@ -111,7 +110,7 @@ class _AddProductState extends State<EditProduct> {
   TextEditingController warrantyController = TextEditingController();
   TextEditingController productSerialNumberController = TextEditingController(text: '');
 
-  var productKey;
+  late String productKey;
 
   void getProductKey(String code) async {
     // ignore: unused_local_variable
@@ -137,8 +136,8 @@ class _AddProductState extends State<EditProduct> {
     productDiscountPriceController.text = widget.productModel.productDiscount;
     productWholesalePriceController.text = widget.productModel.productWholeSalePrice;
     productDealerPriceController.text = widget.productModel.productMrp;
-    productgstType.text = widget.productModel.gstType;
-
+    productManufacturerController.text = widget.productModel.gstType;
+    productUnitController.text=widget.productModel.productStock;
     sizeController.text = widget.productModel.size;
     colorController.text = widget.productModel.color;
     weightController.text = widget.productModel.weight;
@@ -445,20 +444,20 @@ class _AddProductState extends State<EditProduct> {
                                                                   ),
                                                                   child: DropdownButtonHideUnderline(
                                                                       child: DropdownButton<String>(
-                                                                    onChanged: (String? value) {
-                                                                      setState(() {
-                                                                        selectedTime = value!;
-                                                                      });
-                                                                    },
-                                                                    hint: Text(lang.S.of(context).selectWarrantyTime),
-                                                                    value: selectedTime,
-                                                                    items: warrantyTime.map((String items) {
-                                                                      return DropdownMenuItem(
-                                                                        value: items,
-                                                                        child: Text(items),
-                                                                      );
-                                                                    }).toList(),
-                                                                  )),
+                                                                        onChanged: (String? value) {
+                                                                          setState(() {
+                                                                            selectedTime = value!;
+                                                                          });
+                                                                        },
+                                                                        hint: Text(lang.S.of(context).selectWarrantyTime),
+                                                                        value: selectedTime,
+                                                                        items: warrantyTime.map((String items) {
+                                                                          return DropdownMenuItem(
+                                                                            value: items,
+                                                                            child: Text(items),
+                                                                          );
+                                                                        }).toList(),
+                                                                      )),
                                                                 );
                                                               },
                                                             ),
@@ -516,8 +515,18 @@ class _AddProductState extends State<EditProduct> {
                                                   children: [
                                                     Expanded(
                                                       child: TextFormField(
-                                                        initialValue: widget.productModel.productStock,
-                                                        readOnly: true,
+                                                        validator: (value) {
+                                                          if (double.tryParse(value!) == null && !value.isEmptyOrNull) {
+                                                            return 'Enter Quantity.';
+                                                          } else {
+                                                            return null;
+                                                          }
+                                                        },
+                                                        onSaved: (value) {
+                                                          productUnitController.text = value!;
+                                                        },
+                                                        controller: productUnitController,
+                                                        showCursor: true,
                                                         cursorColor: kTitleColor,
                                                         decoration: kInputDecoration.copyWith(
                                                           errorBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
@@ -611,7 +620,8 @@ class _AddProductState extends State<EditProduct> {
                                                 Row(
                                                   children: [
                                                     Expanded(
-                                                      child: TextFormField(
+                                                      child:
+                                                      TextFormField(
                                                         validator: (value) {
                                                           if (double.tryParse(value!) == null && !value.isEmptyOrNull) {
                                                             return 'Enter price in number.';
@@ -663,20 +673,23 @@ class _AddProductState extends State<EditProduct> {
                                                 ),
                                                 const SizedBox(height: 20.0),
 
-                                                ///________Gst_______________________________________________
+                                                ///________Manufacturer_______________________________________________
                                                 SizedBox(
-                                                  child: Expanded(
-                                                    child: TextFormField(
-                                                      initialValue: widget.productModel.gstType,
-                                                      readOnly: true,
-                                                      cursorColor: kTitleColor,
-                                                      decoration: kInputDecoration.copyWith(
-                                                        errorBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
-                                                        labelText: lang.S.of(context).gst,
-                                                        labelStyle: kTextStyle.copyWith(color: kTitleColor),
-                                                        hintText: lang.S.of(context).gst,
-                                                        hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
-                                                      ),
+                                                  child: TextFormField(
+                                                    validator: (value) {
+                                                      return null;
+                                                    },
+                                                    onSaved: (value) {
+                                                      productManufacturerController.text = value!;
+                                                    },
+                                                    controller: productManufacturerController,
+                                                    showCursor: true,
+                                                    cursorColor: kTitleColor,
+                                                    decoration: kInputDecoration.copyWith(
+                                                      labelText: lang.S.of(context).menufetather,
+                                                      labelStyle: kTextStyle.copyWith(color: kTitleColor),
+                                                      hintText: lang.S.of(context).enterMenuFeatherName,
+                                                      hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
                                                     ),
                                                   ),
                                                 ),
@@ -836,8 +849,8 @@ class _AddProductState extends State<EditProduct> {
                                                             productModel.productPurchasePrice = productPurchasePriceController.text;
                                                             productModel.productMrp = productDealerPriceController.text;
                                                             productModel.productWholeSalePrice = productWholesalePriceController.text;
-
-                                                            productModel.gstType = productgstType.text;
+                                                            productModel.productStock=productUnitController.text;
+                                                            productModel.gstType = productManufacturerController.text;
                                                             productModel.warranty = warrantyController.text == '' ? '' : '${warrantyController.text} $selectedTime';
                                                             productModel.productPicture = productPicture;
 
@@ -902,10 +915,10 @@ class _AddProductState extends State<EditProduct> {
                                                                 text: lang.S.of(context).uploadanImage,
                                                                 style: kTextStyle.copyWith(color: kGreenTextColor, fontWeight: FontWeight.bold),
                                                                 children: [
-                                                              TextSpan(
-                                                                  text: lang.S.of(context).ordragdropPNGPG,
-                                                                  style: kTextStyle.copyWith(color: kGreyTextColor, fontWeight: FontWeight.bold))
-                                                            ]))
+                                                                  TextSpan(
+                                                                      text: lang.S.of(context).ordragdropPNGPG,
+                                                                      style: kTextStyle.copyWith(color: kGreyTextColor, fontWeight: FontWeight.bold))
+                                                                ]))
                                                       ],
                                                     ),
                                                   ),
@@ -913,15 +926,15 @@ class _AddProductState extends State<EditProduct> {
                                               ),
                                               image != null
                                                   ? Image.memory(
-                                                      image!,
-                                                      width: 150,
-                                                      height: 150,
-                                                    )
+                                                image!,
+                                                width: 150,
+                                                height: 150,
+                                              )
                                                   : Image.network(
-                                                      productPicture,
-                                                      width: 150,
-                                                      height: 150,
-                                                    ),
+                                                productPicture,
+                                                width: 150,
+                                                height: 150,
+                                              ),
                                             ],
                                           ),
                                         ),

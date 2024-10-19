@@ -1,7 +1,7 @@
 class BrandsModel {
   late String brandName;
 
-  BrandsModel(this.brandName);
+  BrandsModel({required this.brandName});
 
   BrandsModel.fromJson(Map<dynamic, dynamic> json) : brandName = json['brandName'] as String;
 

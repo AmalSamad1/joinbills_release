@@ -45,12 +45,9 @@ class _ShowDuePaymentPopUpState extends State<ShowDuePaymentPopUp> {
 
   List<String> paymentItem = [
     'Cash',
-    'Bank',
+    'UPI',
+    'Net Banking',
     'Due',
-    'B-kash',
-    'Nagad',
-    'Rocket',
-    'DBBL',
   ];
   String selectedPaymentOption = 'Cash';
 

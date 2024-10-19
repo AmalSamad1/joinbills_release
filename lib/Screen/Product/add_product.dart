@@ -83,6 +83,15 @@ class _AddProductState extends State<AddProduct> {
       ref.refresh(categoryProvider);
     });
   }
+  Future<void> postGeneralBrand({required WidgetRef ref}) async {
+    final DatabaseReference categoryInformationRef =
+    FirebaseDatabase.instance.ref().child(constUserId).child('Brands');
+    BrandsModel brandsModel = BrandsModel(brandName: '');
+    await categoryInformationRef.push().set(brandsModel.toJson());
+    setState(() {
+      ref.refresh(categoryProvider);
+    });
+  }
 
   void addCategoryShowPopUp(
       {required WidgetRef ref,
@@ -434,11 +443,13 @@ class _AddProductState extends State<AddProduct> {
         });
   }
 
-  void showBrandPopUp(
-      {required WidgetRef ref,
-      required List<String> brandNameList,
-      required BuildContext addProductsContext}) {
+  void showBrandPopUp({
+    required WidgetRef ref,
+    required List<String> brandNameList,
+    required BuildContext addProductsContext,
+  }) {
     GlobalKey<FormState> brandNameKey = GlobalKey<FormState>();
+
     bool brandValidateAndSave() {
       final form = brandNameKey.currentState;
       if (form!.validate()) {
@@ -449,175 +460,144 @@ class _AddProductState extends State<AddProduct> {
     }
 
     showDialog(
-        barrierDismissible: false,
-        context: addProductsContext,
-        builder: (BuildContext context) {
-          return StatefulBuilder(builder: (context, setState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Container(
-                width: 600,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10)),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(4.0),
-                            decoration:
-                                const BoxDecoration(shape: BoxShape.rectangle),
-                            child: const Icon(
-                              FeatherIcons.plus,
+      barrierDismissible: false,
+      context: addProductsContext,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Container(
+              width: 600,
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(4.0),
+                          child: const Icon(FeatherIcons.plus, color: kTitleColor),
+                        ),
+                        const SizedBox(width: 4.0),
+                        Text(
+                          lang.S.of(context).addBrand,
+                          style: kTextStyle.copyWith(
                               color: kTitleColor,
-                            ),
-                          ),
-                          const SizedBox(width: 4.0),
-                          Text(
-                            lang.S.of(context).addBrand,
-                            style: kTextStyle.copyWith(
-                                color: kTitleColor,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const Spacer(),
-                          const Icon(
-                            FeatherIcons.x,
-                            color: kTitleColor,
-                            size: 21.0,
-                          ).onTap(() {
-                            brandNameController.clear();
-                            finish(context);
-                          })
-                        ],
-                      ),
-                      const SizedBox(height: 20.0),
-                      Divider(
-                        thickness: 1.0,
-                        color: kGreyTextColor.withOpacity(0.2),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Row(
-                        children: [
-                          Text(
-                            lang.S.of(context).brandName,
-                            style: kTextStyle.copyWith(
-                                color: kTitleColor, fontSize: 18.0),
-                          ),
-                          const SizedBox(width: 50),
-                          Form(
-                            key: brandNameKey,
-                            child: SizedBox(
-                              width: 400,
-                              child: TextFormField(
-                                validator: (value) {
-                                  if (value.isEmptyOrNull) {
-                                    return 'Brand name is required.';
-                                  } else if (brandNameList.contains(value
-                                      .removeAllWhiteSpace()
-                                      .toLowerCase())) {
-                                    return 'Brand name is already exist.';
-                                  } else {
-                                    return null;
-                                  }
-                                },
-                                controller: brandNameController,
-                                showCursor: true,
-                                cursorColor: kTitleColor,
-                                decoration: kInputDecoration.copyWith(
-                                  errorBorder: const OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.red)),
-                                  labelText: lang.S.of(context).brandName,
-                                  hintText: lang.S.of(context).enterbrandName,
-                                  hintStyle: kTextStyle.copyWith(
-                                      color: kGreyTextColor),
-                                ),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const Spacer(),
+                        const Icon(FeatherIcons.x, color: kTitleColor, size: 21.0)
+                            .onTap(() {
+                          brandNameController.clear();
+                          Navigator.pop(context);
+                        })
+                      ],
+                    ),
+                    const SizedBox(height: 20.0),
+                    Divider(thickness: 1.0, color: kGreyTextColor.withOpacity(0.2)),
+                    const SizedBox(height: 10.0),
+                    Row(
+                      children: [
+                        Text(
+                          lang.S.of(context).brandName,
+                          style: kTextStyle.copyWith(
+                              color: kTitleColor, fontSize: 18.0),
+                        ),
+                        const SizedBox(width: 50),
+                        Form(
+                          key: brandNameKey,
+                          child: SizedBox(
+                            width: 400,
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Brand name is required.';
+                                } else if (brandNameList.contains(
+                                    value.removeAllWhiteSpace().toLowerCase())) {
+                                  return 'Brand name already exists.';
+                                } else {
+                                  return null;
+                                }
+                              },
+                              controller: brandNameController,
+                              showCursor: true,
+                              cursorColor: kTitleColor,
+                              decoration: kInputDecoration.copyWith(
+                                errorBorder: const OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.red)),
+                                labelText: lang.S.of(context).brandName,
+                                hintText: lang.S.of(context).enterbrandName,
+                                hintStyle: kTextStyle.copyWith(color: kGreyTextColor),
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 10.0),
-                      Divider(
-                        thickness: 1.0,
-                        color: kGreyTextColor.withOpacity(0.2),
-                      ),
-                      const SizedBox(height: 5.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0),
-                                color: kRedTextColor),
-                            child: Text(
-                              lang.S.of(context).cancel,
-                              style:
-                                  kTextStyle.copyWith(color: kWhiteTextColor),
-                            ),
-                          ).onTap(() {
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10.0),
+                    Divider(thickness: 1.0, color: kGreyTextColor.withOpacity(0.2)),
+                    const SizedBox(height: 5.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
                             brandNameController.clear();
-                            finish(context);
-                          }),
-                          const SizedBox(
-                            width: 5.0,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0),
-                                color: kGreenTextColor),
-                            child: Text(
-                              lang.S.of(context).submit,
-                              style:
-                                  kTextStyle.copyWith(color: kWhiteTextColor),
-                            ),
-                          ).onTap(() async {
+                            Navigator.pop(context); // Close the dialog
+                          },
+                          child: Text(lang.S.of(context).cancel),
+                        ),
+                        const SizedBox(width: 5.0),
+                        ElevatedButton(
+                          onPressed: () async {
                             if (brandValidateAndSave()) {
                               try {
                                 EasyLoading.show(status: 'Adding Brand');
                                 final DatabaseReference categoryInformationRef =
-                                    FirebaseDatabase.instance
-                                        .ref()
-                                        .child(constUserId)
-                                        .child('Brands');
+                                FirebaseDatabase.instance
+                                    .ref()
+                                    .child(constUserId)
+                                    .child('Brands');
                                 BrandsModel brandModel =
-                                    BrandsModel(brandNameController.text);
-                                await categoryInformationRef
-                                    .push()
-                                    .set(brandModel.toJson());
+                                BrandsModel(brandName: brandNameController.text);
+                                await categoryInformationRef.push().set(
+                                  brandModel.toJson(),
+                                );
+
+                                setState(() {
+                                  brandName.add(brandModel.brandName);
+                                  selectedBrand = brandModel.brandName;
+                                  brandTime = 1;
+                                });
                                 ref.refresh(brandProvider);
-                                // setState(() {
-                                //   selectedBrand = brandModel.brandName;
-                                //   brandTime = 0;
-                                //   brandName.clear();
-                                // });
+                                ref.refresh(brandProvider.future);
                                 brandNameController.clear();
-                                EasyLoading.showSuccess("Successfully Added");
-                                finish(context);
+                                EasyLoading.showSuccess('Successfully Added');
+                                Navigator.pop(context);
                               } catch (e) {
-                                EasyLoading.showError('Error');
+                                EasyLoading.showError('Error occurred');
                               }
                             }
-                          })
-                        ],
-                      )
-                    ],
-                  ),
+                          },
+                          child: Text(lang.S.of(context).submit),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            );
-          });
+            ),
+          );
         });
+      },
+    );
   }
 
   void showUnitPopUp(
@@ -914,8 +894,8 @@ class _AddProductState extends State<AddProduct> {
       TextEditingController(text: '');
   TextEditingController productDealerPriceController =
       TextEditingController(text: '');
-  TextEditingController productManufacturerController =
-      TextEditingController(text: '');
+  // TextEditingController productManufacturerController =
+  //     TextEditingController(text: '');
   TextEditingController nsnsacController = TextEditingController(text: '');
   TextEditingController productSerialNumberController =
       TextEditingController(text: '');
@@ -1529,112 +1509,75 @@ class _AddProductState extends State<AddProduct> {
                                                 ),
                                                 Row(
                                                   children: [
+                                                    // Brand Dropdown
                                                     brandList.when(
-                                                        data: (brand) {
-                                                      List<String>
-                                                          editBrandList = [];
-                                                      brandTime == 0
-                                                          // ignore: avoid_function_literals_in_foreach_calls
-                                                          ? brand.forEach(
-                                                              (element) {
-                                                              brandName.add(
-                                                                  element
-                                                                      .brandName);
-                                                              // editBrandList.add(element.brandName.removeAllWhiteSpace().toLowerCase());
-                                                              brandTime++;
-                                                            })
-                                                          : null;
-                                                      for (var element
-                                                          in brand) {
-                                                        editBrandList.add(element
-                                                            .brandName
-                                                            .toLowerCase()
-                                                            .removeAllWhiteSpace());
-                                                      }
-                                                      return Expanded(
-                                                        child: FormField(
-                                                          builder:
-                                                              (FormFieldState<
-                                                                      dynamic>
-                                                                  field) {
-                                                            return InputDecorator(
-                                                              decoration:
-                                                                  InputDecoration(
-                                                                      enabledBorder:
-                                                                          const OutlineInputBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.all(Radius.circular(8.0)),
-                                                                        borderSide: BorderSide(
-                                                                            color:
-                                                                                kBorderColorTextField,
-                                                                            width:
-                                                                                2),
-                                                                      ),
-                                                                      suffixIcon: const Icon(FeatherIcons.plus, color: kTitleColor).onTap(() => showBrandPopUp(
-                                                                          ref:
-                                                                              ref,
-                                                                          brandNameList:
-                                                                              editBrandList,
-                                                                          addProductsContext:
-                                                                              context)),
-                                                                      contentPadding:
-                                                                          const EdgeInsets
-                                                                              .all(
-                                                                              8.0),
-                                                                      floatingLabelBehavior:
-                                                                          FloatingLabelBehavior
-                                                                              .always,
-                                                                      labelText: lang
-                                                                          .S
-                                                                          .of(context)
-                                                                          .brand),
-                                                              child:
-                                                                  DropdownButtonHideUnderline(
-                                                                      child: DropdownButton<
-                                                                          String>(
-                                                                onChanged:
-                                                                    (String?
-                                                                        value) {
-                                                                  setState(() {
-                                                                    selectedBrand =
-                                                                        value!;
-                                                                    toast(
-                                                                        selectedBrand);
-                                                                  });
-                                                                },
-                                                                hint: Text(lang
-                                                                    .S
-                                                                    .of(context)
-                                                                    .selectProductBrand),
-                                                                value:
-                                                                    selectedBrand,
-                                                                items: brandName
-                                                                    .map((String
-                                                                        items) {
-                                                                  return DropdownMenuItem(
-                                                                    value:
-                                                                        items,
-                                                                    child: Text(
-                                                                        items),
-                                                                  );
-                                                                }).toList(),
-                                                              )),
-                                                            );
-                                                          },
-                                                        ),
-                                                      );
-                                                    }, error: (e, stack) {
-                                                      return Center(
-                                                        child:
-                                                            Text(e.toString()),
-                                                      );
-                                                    }, loading: () {
-                                                      return const Center(
-                                                        child:
-                                                            CircularProgressIndicator(),
-                                                      );
-                                                    }),
-                                                    const SizedBox(width: 20.0),
+                                                      data: (brand) {
+                                                        if (brandTime == 0 && brand.isNotEmpty) {
+                                                          // Load brand names initially
+                                                          for (var element in brand) {
+                                                            brandName.add(element.brandName);
+                                                          }
+                                                          brandTime++;
+                                                        }
+
+                                                        List<String> editBrandList = brand
+                                                            .map((element) => element.brandName.removeAllWhiteSpace().toLowerCase())
+                                                            .toList();
+
+                                                        return Expanded(
+                                                          child: FormField(
+                                                            builder: (FormFieldState<dynamic> field) {
+                                                              return InputDecorator(
+                                                                decoration: InputDecoration(
+                                                                  enabledBorder: const OutlineInputBorder(
+                                                                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                                                                    borderSide: BorderSide(color: kBorderColorTextField, width: 2),
+                                                                  ),
+                                                                  suffixIcon: const Icon(FeatherIcons.plus, color: kTitleColor)
+                                                                      .onTap(() => showBrandPopUp(
+                                                                    ref: ref,
+                                                                    brandNameList: editBrandList,
+                                                                    addProductsContext: context,
+                                                                  )),
+                                                                  contentPadding: const EdgeInsets.all(8.0),
+                                                                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                                                                  labelText: lang.S.of(context).brand,
+                                                                ),
+                                                                child: DropdownButtonHideUnderline(
+                                                                  child: DropdownButton<String>(
+                                                                    onChanged: (String? value) {
+                                                                      if (value != null && value != selectedBrand) {
+                                                                        setState(() {
+                                                                          selectedBrand = value;
+                                                                        });
+                                                                        toast(selectedBrand);
+                                                                      }
+                                                                    },
+                                                                    hint: Text(lang.S.of(context).selectProductBrand),
+                                                                    value: selectedBrand,
+                                                                    items: brandName.map((String items) {
+                                                                      return DropdownMenuItem(
+                                                                        value: items,
+                                                                        child: Text(items),
+                                                                      );
+                                                                    }).toList(),
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                        );
+                                                      },
+                                                      error: (e, stack) {
+                                                        return Center(child: Text(e.toString()));
+                                                      },
+                                                      loading: () {
+                                                        return const Center(child: CircularProgressIndicator());
+                                                      },
+                                                    ),
+
+
+              const SizedBox(width: 20.0),
                                                     Expanded(
                                                       child: TextFormField(
                                                         validator: (value) {

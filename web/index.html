@@ -21,19 +21,17 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Billing Software">
-    <link rel="apple-touch-icon" href="icons/jb.png">
+    <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="jb.png" imagesizes="100"/>
 
-    <title>Billing Software</title>
+    <title>JoinBills</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 </head>
 <body>
-<script  {{flutter_bootstrap_js}}
-></script>
 <!-- This script installs service_worker.js to provide PWA functionality to
      application. For more information, see:
      https://developers.google.com/web/fundamentals/primers/service-workers -->
@@ -44,31 +42,33 @@
 <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('flutter-first-frame', function () {
-        navigator.serviceWorker.register('flutter_service_worker.js');
+        navigator.serviceWorker.register('flutter_service_worker.js?v=538907864');
       });
     }
   </script>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+
 <script>
-  var firebaseConfig = {
-    apiKey: "AIzaSyDmao83PAnXXAFRr072ztz6u47PE9lSKF8",
-    authDomain: "saas-73180.firebaseapp.com",
-    databaseURL: "https://saas-73180-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "saas-73180",
-    storageBucket: "saas-73180.appspot.com",
-    messagingSenderId: "1019185740930",
-    appId: "1:1019185740930:web:1a43a551b8af660356889b",
-    measurementId: "G-GPL33XWTPK"
-  };
+            var firebaseConfig = {
+      apiKey: "AIzaSyDmao83PAnXXAFRr072ztz6u47PE9lSKF8",
+      authDomain: "saas-73180.firebaseapp.com",
+      databaseURL: "https://saas-73180-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "saas-73180",
+      storageBucket: "joinbills-65061.appspot.com",
+      messagingSenderId: "1019185740930",
+      appId: "1:1019185740930:web:1a43a551b8af660356889b",
+      measurementId: "G-GPL33XWTPK"
+            };
 
-  // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const analytics = firebase.analytics(app);
-</script>
-
-
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+          </script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="js/payment.js"></script>
 <script type="text/javascript">
   function openRazorpayCheckout(options) {
@@ -78,9 +78,16 @@
       console.error("No key passed to Razorpay");
       return;
     }
-
-    var rzp = new Razorpay(options);
-    rzp.open();
+        var rzp = new Razorpay(options);
+            rzp.open();
+            rzp.on('payment.failed', function (response) {
+                console.log(response);
+                // Handle payment failure
+            });
+            rzp.on('payment.success', function (response) {
+                console.log(response);
+                // Handle payment success
+            });
   }
 </script>
 

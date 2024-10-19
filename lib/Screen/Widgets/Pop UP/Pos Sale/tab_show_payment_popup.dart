@@ -42,10 +42,8 @@ class _TabShowPaymentPopUpState extends State<TabShowPaymentPopUp> {
   List<String> paymentItem = [
     'Bank',
     'Due',
-    'B-kash',
-    'Nagad',
-    'Rocket',
-    'DBBL',
+    'UPI',
+    'Net'
   ];
   String selectedPaymentOption = 'Bank';
 

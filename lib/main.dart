@@ -30,6 +30,7 @@ import 'package:salespro_admin/Screen/Reports/report_screen.dart';
 import 'package:salespro_admin/Screen/Supplier%20List/supplier_list.dart';
 import 'package:salespro_admin/Screen/User%20Role%20System/user_role_screen.dart';
 import 'package:salespro_admin/Screen/daily_tanasaction.dart';
+import 'package:salespro_admin/subscription.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'Language/language_change_provider.dart';
 import 'Screen/Authentication/forgot_password.dart';
@@ -116,7 +117,7 @@ class MyApp extends StatelessWidget {
                 TabletSignUp.route: (context) => const TabletSignUp(),
                 DailyTransactionScreen.route: (context) => const DailyTransactionScreen(),
                 //Tablet
-                TablateHome.route: (context) => const TablateHome(),
+                // TablateHome.route: (context) => const TablateHome(),
                 TabletProductScreen.route: (context) => const TabletProductScreen(),
                 TabletAddProduct.route: (context) => const TabletAddProduct(),
                 LedgerScreen.route: (context) => const LedgerScreen(),

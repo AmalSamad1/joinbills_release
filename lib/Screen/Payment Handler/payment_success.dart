@@ -52,10 +52,7 @@ class PaymentSuccess extends StatefulWidget {
 
     await subscriptionRef.set(subscriptionModel.toJson());
 
-
-
-
-    EasyLoading.showSuccess('Added Successfully', duration: const Duration());
+    EasyLoading.showSuccess('Added Successfully', duration: const Duration(milliseconds: 300));
     // ignore: use_build_context_synchronously
     Navigator.pushNamed(context, MtHomeScreen.route);
     // MtHomeScreen().launch(context);

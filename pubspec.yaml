@@ -32,9 +32,6 @@ dependencies:
 
   flutter_localizations:
     sdk: flutter
-
-
-
   flutter_feather_icons:
   font_awesome_flutter:
   syncfusion_flutter_charts:
@@ -50,7 +47,7 @@ dependencies:
   fluttertoast: 8.0.9
   cached_network_image:
   simple_barcode_scanner:
-
+  razorpay_web: ^1.4.2
   printing:
   http_auth:
   http:
@@ -58,20 +55,18 @@ dependencies:
   auto_size_text:
   date_time_format:
   provider:
-  eventify:
   image:
   flag:
   dropdown_button2:
   firebase_storage:
-  image_picker:
   nb_utils:
   image_picker_web:
   path_provider:
   open_file:
   google_fonts:
   pdf:
-
-
+  image_picker: ^1.0.4
+  syncfusion_flutter_core: ^27.1.53
 
 
 
@@ -86,7 +81,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints:
+  flutter_lints: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

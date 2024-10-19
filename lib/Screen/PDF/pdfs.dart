@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:date_time_format/date_time_format.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
@@ -18,15 +18,34 @@ import '../POS Sale/pos_sale.dart';
 import '../Purchase/purchase.dart';
 
 class GeneratePdfAndPrint {
-  Future<pw.Widget> getImageFromUrl(String imageUrl) async {
-    final response = await http.get(Uri.parse(imageUrl));
-    final bytes = response.bodyBytes;
-    final image = pw.MemoryImage(
-      Uint8List.fromList(bytes),
-    );
+  // Future<pw.Widget> getImageFromUrl(String imageUrl) async {
+  //   final response = await http.get(Uri.parse(imageUrl));
+  //   final bytes = response.bodyBytes;
+  //   final image = pw.MemoryImage(
+  //     Uint8List.fromList(bytes),
+  //   );
+  //
+  //   return pw.Container(child: pw.Image(image));
+  // }
 
-    return pw.Container(child: pw.Image(image));
+  Future<pw.Widget> getImageFromUrl(String imageUrl) async {
+    try {
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        final bytes = response.bodyBytes;
+        final image = pw.MemoryImage(Uint8List.fromList(bytes));
+
+        return pw.Image(image);
+      } else {
+        throw Exception('Failed to load image: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle error (e.g., log it or return a placeholder image)
+      print('Error loading image: $e');
+      return pw.Text('Error loading image'); // Placeholder
+    }
   }
+
 
   Future<void> printSaleInvoice({required PersonalInformationModel personalInformationModel, required SaleTransactionModel saleTransactionModel, BuildContext? context}) async {
     await Printing.layoutPdf(
@@ -78,7 +97,8 @@ class GeneratePdfAndPrint {
     final netImage = await networkImage(
       'https://www.nfet.net/nfet.jpg',
     );
-    doc.addPage(pw.MultiPage(
+    doc.addPage(
+        pw.MultiPage(
         pageFormat: PdfPageFormat.letter.copyWith(marginBottom: 1.5 * PdfPageFormat.cm),
         margin: pw.EdgeInsets.zero,
         crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -786,12 +806,41 @@ class GeneratePdfAndPrint {
   }
 
   FutureOr<Uint8List> generateSaleDocumentClint({required SaleTransactionModel transactions, required PersonalInformationModel personalInformation}) async {
+    String getgstAmount() {
+      num total = 0.0;
+
+      for (var item in transactions.productList!) {
+        // Use null-aware operator to provide a default value
+        double gstAmount = double.tryParse(item.gstAmount ?? "0.0") ?? 0.0;
+
+        // Multiply by quantity and add to total
+        total += gstAmount * item.quantity;
+      }
+
+      return total.toString();
+    }
     EasyLoading.show(status: 'Loading...');
     double basicFontSize = 10;
     final pw.Document doc = pw.Document();
+    // final ref =
+    // FirebaseStorage.instance.refFromURL(list.first);
+    // String url = (await ref.getDownloadURL()).toString();
+
     List<String> list = personalInformation.pictureUrl.split('?');
-    final httpsReference = FirebaseStorage.instance.refFromURL(list.first);
-    Uint8List? imageBytes = await httpsReference.getData();
+    final httpsReference = FirebaseStorage.instance.refFromURL(list.first);  // Use full URL if needed
+    Uint8List? imageBytes;
+
+    try {
+      // Load the image bytes asynchronously
+      imageBytes = await httpsReference.getData();
+      print('Image loaded successfully');
+    } catch (e) {
+      print('Failed to load image: $e');
+      // Exit the function if image loading fails
+    }
+
+
+    final logoImage = personalInformation.pictureUrl != "" ? await networkImage('${personalInformation.pictureUrl}') : null;
     EasyLoading.dismiss();
     doc.addPage(
       pw.MultiPage(
@@ -822,9 +871,8 @@ class GeneratePdfAndPrint {
                       padding: const pw.EdgeInsets.only(bottom: 3.0 * PdfPageFormat.mm),
                       decoration: pw.BoxDecoration(
                           image: pw.DecorationImage(
-                              image: pw.MemoryImage(
-                        imageBytes!,
-                      ))),
+                              image:pw.MemoryImage(imageBytes!)
+                          )),
                     ),
 
                     pw.SizedBox(width: 10.0),
@@ -1405,9 +1453,8 @@ class GeneratePdfAndPrint {
                                 ),
                               ),
                             ),
-                            for (int i = 0; i < transactions.productList!.length; i++)
-                            pw.Text(
-                              (int.parse(transactions.productList!.elementAt(i).gstAmount) * transactions.productList!.elementAt(i).quantity.toInt()).toString(),
+                            // for (int i = 0; i < transactions.productList!.length; i++)
+                            pw.Text(getgstAmount().toString(),
                               style: const pw.TextStyle(
                                 color: PdfColors.black,
                               ),
@@ -1509,13 +1556,18 @@ class GeneratePdfAndPrint {
     return doc.save();
   }
 
-  FutureOr<Uint8List> generatePurchaseDocumentClint({required PurchaseTransactionModel transactions, required PersonalInformationModel personalInformation}) async {
+  FutureOr<dynamic> generatePurchaseDocumentClint({required PurchaseTransactionModel transactions, required PersonalInformationModel personalInformation}) async {
     EasyLoading.show(status: 'Loading...');
+
+
     double basicFontSize = 10;
     final pw.Document doc = pw.Document();
     List<String> list = personalInformation.pictureUrl.split('?');
     final httpsReference = FirebaseStorage.instance.refFromURL(list.first);
     Uint8List? imageBytes = await httpsReference.getData();
+
+    // String profilePicture = 'https://i.imgur.com/jlyGd1j.jpg';
+    // final netImage = await networkImage(profilePicture);
     EasyLoading.dismiss();
     doc.addPage(
       pw.MultiPage(
@@ -1546,9 +1598,7 @@ class GeneratePdfAndPrint {
                       padding: const pw.EdgeInsets.only(bottom: 3.0 * PdfPageFormat.mm),
                       decoration: pw.BoxDecoration(
                           image: pw.DecorationImage(
-                              image: pw.MemoryImage(
-                        imageBytes!,
-                      ))),
+                              image: pw.MemoryImage(imageBytes!))),
                     ),
 
                     pw.SizedBox(width: 10.0),
@@ -2647,7 +2697,7 @@ class GeneratePdfAndPrint {
   FutureOr<Uint8List> generateSaleDocument({required SaleTransactionModel transactions, required PersonalInformationModel personalInformation}) async {
     final pw.Document doc = pw.Document();
     final netImage = await networkImage(
-      'https://www.nfet.net/nfet.jpg',
+      '${personalInformation.pictureUrl}',
     );
     doc.addPage(
       pw.MultiPage(
@@ -3643,11 +3693,14 @@ String amountToWords(int amount) {
   final List<String> tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
   final List<String> teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
 
-  if (amount == 0) {
-    return 'zero';
-  }
+  if (amount == 0) return 'zero';
 
   String words = '';
+
+  if ((amount ~/ 1000000) > 0) {
+    words += '${amountToWords(amount ~/ 1000000)} million ';
+    amount %= 1000000;
+  }
   if ((amount ~/ 1000) > 0) {
     words += '${amountToWords(amount ~/ 1000)} thousand ';
     amount %= 1000;
@@ -3656,10 +3709,8 @@ String amountToWords(int amount) {
     words += '${units[amount ~/ 100]} hundred ';
     amount %= 100;
   }
+
   if (amount > 0) {
-    if (words.isNotEmpty) {
-      words += 'and ';
-    }
     if (amount < 10) {
       words += units[amount];
     } else if (amount < 20) {
@@ -3669,5 +3720,12 @@ String amountToWords(int amount) {
     }
   }
 
+  // Handle the case where amount is exactly 1001 or similar
+  if (words.endsWith(' thousand one')) {
+    words = words.replaceAll(' thousand one', ' thousand and one');
+  }
+
   return words.trim();
+
+
 }

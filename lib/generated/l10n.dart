@@ -2852,8 +2852,8 @@ String get gst{
   /// `Manufacturer`
   String get menufetather {
     return Intl.message(
-      'Manufacturer',
-      name: 'menufetather',
+      'GST',
+      name: 'GSt',
       desc: '',
       args: [],
     );
@@ -2862,8 +2862,8 @@ String get gst{
   /// `Enter Manufacturer Name`
   String get enterMenuFeatherName {
     return Intl.message(
-      'Enter Manufacturer Name',
-      name: 'enterMenuFeatherName',
+      'GST',
+      name: 'enterGST',
       desc: '',
       args: [],
     );

@@ -117,7 +117,7 @@ class _EditCustomerState extends State<EditCustomer> {
   TextEditingController shippingLandmarkController = TextEditingController();
   TextEditingController shippingStateController = TextEditingController();
   TextEditingController shippingPhoneController = TextEditingController();
-
+  TextEditingController editOpeningBalance = TextEditingController();
   @override
   void initState() {
     if (widget.typeOfCustomerAdd == 'Buyer') {
@@ -136,6 +136,7 @@ class _EditCustomerState extends State<EditCustomer> {
     selectedCategories = widget.customerModel.type;
     profilePicture = widget.customerModel.profilePicture;
     customerNameController.text = widget.customerModel.customerFullName;
+    editOpeningBalance.text=widget.customerModel.dueAmount;
     customerPhoneController.text = widget.customerModel.phoneNumber;
     customerEmailController.text = widget.customerModel.emailAddress;
     customerAddressController.text = widget.customerModel.customerAddress;
@@ -339,8 +340,7 @@ class _EditCustomerState extends State<EditCustomer> {
                                                         validator: (value) {
                                                           return null;
                                                         },
-                                                        readOnly: true,
-                                                        initialValue: widget.customerModel.dueAmount,
+                                                    controller: editOpeningBalance,
                                                         cursorColor: kTitleColor,
                                                         decoration: kInputDecoration.copyWith(
                                                           labelText: lang.S.of(context).openingBalance,
@@ -621,7 +621,7 @@ class _EditCustomerState extends State<EditCustomer> {
                                                                 profilePicture: profilePicture,
                                                                 emailAddress: customerEmailController.text,
                                                                 customerAddress: customerAddressController.text,
-                                                                dueAmount: widget.customerModel.dueAmount,
+                                                                dueAmount: editOpeningBalance.text,
                                                                 remainedBalance: widget.customerModel.remainedBalance,
                                                                 openingBalance: widget.customerModel.openingBalance,
                                                                 shippingState: shippingStateController.text,
@@ -658,6 +658,7 @@ class _EditCustomerState extends State<EditCustomer> {
                                                                               DatabaseReference reference = FirebaseDatabase.instance.ref("$constUserId/Sales Transition/$key");
                                                                               await reference.update(
                                                                                   {'customerName': customerModel.customerFullName, 'customerPhone': customerModel.phoneNumber});
+
                                                                             }
                                                                           }
                                                                         })

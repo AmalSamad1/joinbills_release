@@ -64,12 +64,9 @@ class _ShowPaymentPopUpState extends State<ShowPaymentPopUp> {
 
   List<String> paymentItem = [
     'Cash',
-    'Bank',
+    'UPI',
+    'Net Banking',
     'Due',
-    'Bkash',
-    'Nagad',
-    'Rocket',
-    'DBBL',
   ];
   String selectedPaymentOption = 'Cash';
   String neftNo = '';
@@ -446,7 +443,7 @@ class _ShowPaymentPopUpState extends State<ShowPaymentPopUp> {
                                               ? () async
                                           {{
                                           if (widget.transitionModel.customerType == "Guest" && dueAmountController.text.toDouble() > 0) {
-                                          EasyLoading.showError('Due is not available Foe Guest');
+                                          EasyLoading.showError('Due is not available For Guest');
                                           } else
                                           {
 
@@ -664,7 +661,7 @@ class _ShowPaymentPopUpState extends State<ShowPaymentPopUp> {
 
                                           ///________Subscription______________________________________________________________________________
 
-                                          Subscription.decreaseSubscriptionLimits(itemType: 'saleNumber', context: context);
+                                          // Subscription.decreaseSubscriptionLimits(itemType: 'saleNumber', context: context);
 
                                           ///________daily_transactionModel_________________________________________________________________________
 

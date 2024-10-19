@@ -7,8 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:salespro_admin/Repository/paypal_repo.dart';
+import 'package:razorpay_web/razorpay_web.dart';
 import 'package:salespro_admin/model/subscription_model.dart';
+import '../../Provider/profile_provider.dart';
 import '../../Provider/subacription_plan_provider.dart';
 import '../../Repository/subscription_plan_repo.dart';
 import '../../constant.dart';
@@ -38,7 +39,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
 
 
 // Assuming you have created an order via your backend
-
+  late Razorpay _razorpay;
 
   SubscriptionModel currentSubscriptionPlan = SubscriptionModel(
     subscriptionName: 'Free',
@@ -57,141 +58,106 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       currentSubscriptionPlan;
     });
   }
-  Razorpay? _razorpay;
+
   // Function to add a new seller
 
 
 // Function to update seller info
-
+var update;
   @override
   initState() {
     super.initState();
     // voidLink(context: context);
     _razorpay = Razorpay();
-    _razorpay?.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay?.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay?.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-    _handlePaymentSuccess;
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
     getCurrentSubscriptionPlan();
     // MyApp.getPaypalInfo();
-    planName;
+    options;
+    update;
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    log('Success Response: $response');
+    Fluttertoast.showToast(
+        msg: "SUCCESS: ${response.paymentId!}",
+        toastLength: Toast.LENGTH_SHORT);
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    log('Error Response: $response');
+    Fluttertoast.showToast(
+        msg: "ERROR: ${response.code} - ${response.message!}",
+        toastLength: Toast.LENGTH_SHORT);
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    log('External SDK Response: $response');
+    Fluttertoast.showToast(
+        msg: "EXTERNAL_WALLET: ${response.walletName!}",
+        toastLength: Toast.LENGTH_SHORT);
   }
 
 
 
 
-  void openCheckout(String contact, String email,var amount,) {
-    var options = js.JsObject.jsify({
-      "key": "rzp_live_LQpw9dfarShC9Z", // Razorpay Key ID
-      "amount": amount, // Amount in paise (50000 paise = 500 INR)
-      "currency": "INR",
-      "name": "JoinBills",
-      "description": "Subscription Payment",
-      "prefill": {
-        "contact": contact,
-        "email": email,
-      },
-      "external": {
-        "wallets": ["paytm"]
-      },
-      "handler": js.allowInterop((response) {
-        // Handle successful payment response
-        print("Payment ID: ${response['razorpay_payment_id']}");
-        EasyLoading.showSuccess("Payment Successful: ${response['razorpay_payment_id']}");
-      }),
-      "modal": {
-        "ondismiss": js.allowInterop(() {
-          // Handle payment modal dismissal
-          print("Checkout form closed");
-          EasyLoading.showError("Checkout form closed");
-        })
-      }
-    });
-
-    try {
-      // Call the JavaScript function to open the Razorpay checkout
-      js.context.callMethod('openRazorpayCheckout', [options]);
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
 
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    _razorpay?.clear();
+    _razorpay.clear();
   }
-  var contact;
-  var email;
-
-  var planName;
-  // void openCheckout(String contact, String email,var amount,)  {
-  //
-  //   var options = js.JsObject.jsify({
+  // void openCheckout(var amount) {
+  //   var options = {
   //     "key":"rzp_live_LQpw9dfarShC9Z", // Razorpay Key ID
   //     "amount": amount, // Amount in paise (50000 paise = 500 INR)
   //     "currency": "INR",
   //     "name": "JoinBills",
   //     "description": "Subscription",
   //     "prefill": {
-  //       "contact": contact,
-  //       "email": email,
+  //       "contact": "6238419182",
+  //       "email": FirebaseAuth.instance.currentUser?.email,
   //     },
-  //     "external": {
-  //       "wallets": ["paytm"]
-  //     },
-  //     "handler": js.allowInterop((response)  {
-  //       // Handle successful payment response
-  //       print("Payment ID: ${response['razorpay_payment_id']}");
+  //   };
   //
-  //       // Assuming constUserId is your user ID
-  //       // EasyLoading.showSuccess("Payment Successful: ${response['razorpay_payment_id']}");
-  //     }),
-  //     "modal": {
-  //       "ondismiss": js.allowInterop(() {
-  //         // Handle payment modal dismissal
-  //         print("Checkout form closed");
-  //         EasyLoading.showError("Checkout form closed");
-  //       })
-  //     }
-  //   });
   //   try {
-  //     // Call the JavaScript function to open the Razorpay checkout
-  //     js.context.callMethod('openRazorpayCheckout', [options]);
+  //     js.context.callMethod('openRazorpayCheckout', [js.JsObject.jsify(options)]);
+  //
   //   } catch (e) {
-  //     print('Error: $e');
+  //     print(e);
   //   }
   // }
 
-  // Payment success handler
-  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    SubscriptionPlanRepo subscriptionPlanRepo = SubscriptionPlanRepo();
-    List<SubscriptionPlanModel> planList = await subscriptionPlanRepo.getAllSubscriptionPlans();
-    EasyLoading.showSuccess('Payment Successful');
+  var options;
+  var planName;
 
-    for(var i in planList ){
-      await PaymentSuccess.updateSubscription(constUserId,i.subscriptionName, context);
 
+  String formatDuration(int days) {
+    if (days >= 365 && days < 730) {
+      return "1 year";
+    } else if (days >= 730 && days < 1095) {
+      return "2 years";
+    } else if (days >= 1095) {
+      return "3 years"; // Or more, adjust as needed
+    } else {
+      return "$days days";
     }
-
-    // Call updateSubscription after successful payment
-
   }
 
-  // Payment error handler
-  void _handlePaymentError(PaymentFailureResponse response) {
-    EasyLoading.showError('Payment Failed');
-  }
 
-  // External wallet handler (Optional)
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    EasyLoading.showInfo('External Wallet selected');
-  }
+
+
   List<Color> colors = [
     const Color(0xFF06DE90),
     const Color(0xFFF5B400),
     const Color(0xFFFF7468),
+  ];
+  var select=[
+    0,
+    489900 ,
+    989900
   ];
   // PaypalRepo paypalRepo = PaypalRepo();
   SubscriptionPlanModel selectedPlan =
@@ -203,7 +169,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       backgroundColor: kDarkWhite,
       body: Consumer(builder: (context, ref, __) {
         final subscriptionData = ref.watch(subscriptionPlanProvider);
-        // final personDetials = ref.watch(personalInformationModel);
+        final personDetials = ref.watch(profileDetailsProvider);
         return Scrollbar(
           controller: mainScroll,
           child: SingleChildScrollView(
@@ -220,7 +186,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                     isTab: false,
                   ),
                 ),
-                subscriptionData.when(data: (data) {
+              subscriptionData.when(data: (data) {
                   return SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
@@ -254,7 +220,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                             const SizedBox(height: 20.0),
                             Center(
                               child: SizedBox(
-                                width: context.width() < 1080 ? 1080 - 240 : MediaQuery.of(context).size.width - 240,
+                                width: context.width() < 1080 ? 1080 - 540 : MediaQuery.of(context).size.width - 540,
                                 height: 500,
                                 child: ListView.builder(
                                   physics: const ClampingScrollPhysics(),
@@ -303,7 +269,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                                                         mainAxisSize: MainAxisSize.min,
                                                         children: [
                                                           Text(
-                                                            data[index].offerPrice > 0 ? '$currency${data[index].subscriptionPrice}' : '',
+                                                            data[index].offerPrice > 0 ? '$currency${data[index].offerPrice}' : '',
                                                             style: const TextStyle(
                                                               decoration: TextDecoration.lineThrough,
                                                               fontSize: 18,
@@ -316,7 +282,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                                                           ),
                                                           const SizedBox(width: 4.0),
                                                           Text(
-                                                            '/${data[index].duration} Day',
+                                                            '/${formatDuration(data[index].duration)} ',
                                                             style: kTextStyle.copyWith(color: kTitleColor),
                                                           ),
                                                         ],
@@ -494,15 +460,87 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                                                             ),
                                                           ],
                                                         ),
-                                                      ).onTap(() async {
-                                                        if (index >= 0 && index < data.length && data[index].subscriptionPrice > 0) {
+                                                      ).onTap(()  {
 
+                                                        void openCheckout(var amount,)  async {
 
-                                                          openCheckout("8113808039", "amalasamad9@gmail.com", data[index].offerPrice.toString());
+                                                          options = js.JsObject.jsify({
+                                                            "key":"rzp_live_LQpw9dfarShC9Z", // Razorpay Key ID
+                                                            "amount": amount, // Amount in paise (50000 paise = 500 INR)
+                                                            "currency": "INR",
+                                                            "name": "JoinBills",
+                                                            "description": "Subscription",
+                                                            "prefill": {
+                                                              "contact": "${personDetials.value?.phoneNumber}",
+                                                              "email": FirebaseAuth.instance.currentUser?.email,
+                                                            },
+                                                            "handler": js.allowInterop((response)  {
+                                                              // Handle successful payment response
+                                                              print("Payment ID: ${response['razorpay_payment_id']}");
+                                                              print("payment Details: ${response.toString()}");
+                                                              // String paymentMethod = response['method']; // 'method' should be part of Razorpay response
+                                                              print("Payment Details: ${response.toString()}");
 
-                                                        } else {
-                                                          EasyLoading.showError('Failed');
+                                                              // Display or log the payment method
+                                                              // print("Payment Method: $paymentMethod");
+                                                              setState(() async {
+                                                                PaymentSuccess.updateSubscription(
+                                                                  constUserId,
+                                                                  data[index].subscriptionName,
+                                                                  context,
+                                                                );
+                                                                Map<String, dynamic> subscriptionUpdate = {
+                                                                  'subscriptionDate': DateTime.now().toString(),
+                                                                  'subscriptionName': '${data[index].subscriptionName}',
+                                                                  'subscriptionPrice': '${data[index].subscriptionPrice}',
+                                                                  'subscriptionMethod': 'Paid',
+                                                                };
+// Query the database to find the seller with the matching userId
+                                                                DatabaseReference ref = FirebaseDatabase.instance.ref().child('Admin Panel').child('Seller List');
+
+                                                                DatabaseEvent event = await ref.once();  // Fetch all seller records once
+
+// Iterate through the records to find the one with the matching userId
+                                                                if (event.snapshot.value != null) {
+                                                                  Map data = event.snapshot.value as Map;
+
+                                                                  data.forEach((key, value) {
+                                                                    if (value['userId'] == constUserId) {
+                                                                      // Once the matching seller is found, use the Firebase key (key) to update the data
+                                                                      ref.child(key).update(subscriptionUpdate).then((_) {
+                                                                        print('Subscription details updated for seller with userId: $constUserId');
+                                                                      }).catchError((error) {
+                                                                        print('Failed to update subscription details: $error');
+                                                                      });
+                                                                    }
+                                                                  });
+                                                                }
+                                                              });
+                                                              // Assuming constUserId is your user ID
+                                                              // EasyLoading.showSuccess("Payment Successful: ${response['razorpay_payment_id']}");
+                                                            }),
+                                                            "modal": {
+                                                              "ondismiss": js.allowInterop(() {
+                                                                // Handle payment modal dismissal
+                                                                print("Checkout form closed");
+                                                                EasyLoading.showError("Checkout form closed");
+                                                              })
+                                                            }
+                                                          });
+                                                          try {
+                                                            // Call the JavaScript function to open the Razorpay checkout
+                                                            js.context.callMethod('openRazorpayCheckout', [options]);
+                                                            update;
+                                                          } catch (e) {
+                                                            print('Error: $e');
+                                                          }
                                                         }
+                                                          // Call openCheckout directly without expecting a return value
+                                                        openCheckout(select[index % 3]);
+
+
+                                                          // Handle the result in the payment success/error callbacks (no need to expect a return URL)
+
 
                                                       }).visible(
                                                           currentSubscriptionPlan.subscriptionName != data[index].subscriptionName && data[index].subscriptionName != 'Free')

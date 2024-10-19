@@ -86,8 +86,8 @@ class Invoice {
     // Create a PDF document.
     final doc = pw.Document();
 
-    _logo = await rootBundle.loadString('images/mpos.png');
-    _bgShape = await rootBundle.loadString('images/mpos.png');
+    _logo = await rootBundle.loadString('images/jb.png');
+    _bgShape = await rootBundle.loadString('images/jb.png');
 
     // Add page to the PDF
     doc.addPage(

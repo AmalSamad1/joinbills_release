@@ -1,0 +1,11 @@
+{
+  "projects": {
+    "staging": "saas-73180",
+    "default": "saas-73180",
+    "development": "saas-73180",
+    "production": "saas-73180"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}

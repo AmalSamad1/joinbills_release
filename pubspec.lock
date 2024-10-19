@@ -226,7 +226,7 @@ packages:
     source: hosted
     version: "2.0.1"
   eventify:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: eventify
       sha256: b829429f08586cc2001c628e7499e3e3c2493a1d895fd73b00ecb23351aa5a66
@@ -765,6 +765,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.2"
+  package_info_plus:
+    dependency: transitive
+    description:
+      name: package_info_plus
+      sha256: "7e76fad405b3e4016cd39d08f455a4eb5199723cf594cd1b8916d47140d93017"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.0"
+  package_info_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: package_info_plus_platform_interface
+      sha256: "9bc8ba46813a4cc42c66ab781470711781940780fd8beddd0c3da62506d3a6c6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   path:
     dependency: transitive
     description:
@@ -965,6 +981,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.2"
+  razorpay_web:
+    dependency: "direct main"
+    description:
+      name: razorpay_web
+      sha256: "9508cd61d8b8380d26053beac4b43d09b3828b05f153e6429b5eb716fd8898e0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.2"
   riverpod:
     dependency: transitive
     description:
@@ -1118,18 +1142,18 @@ packages:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_charts
-      sha256: bdb7cc5814ceb187793cea587f4a5946afcffd96726b219cee79df8460f44b7b
+      sha256: "09ac1852116589f1babf0823c96a41325f41ef4dc490a63e2bb0a299e6afb96b"
       url: "https://pub.dev"
     source: hosted
-    version: "21.2.4"
+    version: "1.0.0-beta.2"
   syncfusion_flutter_core:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: syncfusion_flutter_core
-      sha256: "8db8f55c77f56968681447d3837c10f27a9e861e238a898fda116c7531def979"
+      sha256: becd190595cba56feac5ec17b805b35df9f006171c131c209f79b5c58fc780eb
       url: "https://pub.dev"
     source: hosted
-    version: "21.2.10"
+    version: "27.1.53"
   synchronized:
     dependency: transitive
     description:

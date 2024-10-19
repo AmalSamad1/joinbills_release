@@ -35,38 +35,57 @@ class ProfileSetUp extends StatefulWidget {
 }
 
 class _ProfileSetUpState extends State<ProfileSetUp> {
-  String initialCountry = 'Bangladesh';
+  String initialCountry = 'India';
   late String companyName, phoneNumber;
   String profilePicture = 'https://i.imgur.com/jlyGd1j.jpg';
 
   Uint8List? image;
 
-  Future<void> uploadFile() async {
-    // File file = File(filePath);
+  Future<void> uploadFile({String fileExtension = 'jpg'}) async {
     if (kIsWeb) {
       try {
         Uint8List? bytesFromPicker = await ImagePickerWeb.getImageAsBytes();
-        bytesFromPicker != null ? EasyLoading.show(status: 'Uploading... ', dismissOnTap: false) : null;
-        // File? file = await ImagePickerWeb.getImageAsFile();
-        var snapshot = await FirebaseStorage.instance.ref('Profile Picture/${DateTime.now().millisecondsSinceEpoch}').putData(bytesFromPicker!);
-        var url = await snapshot.ref.getDownloadURL();
-        EasyLoading.showSuccess('Upload Successful!');
-        setState(() {
-          image = bytesFromPicker;
-          profilePicture = url.toString();
-        });
+        if (bytesFromPicker != null) {
+          EasyLoading.show(status: 'Uploading... ', dismissOnTap: false);
+
+          // Use the current timestamp and user-provided extension (default is jpg)
+          String fileName = 'Profile Picture/${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+
+          // Upload image to Firebase Storage
+          var snapshot = await FirebaseStorage.instance
+              .ref(fileName)
+              .putData(bytesFromPicker);
+
+          // Get the download URL
+          var url = await snapshot.ref.getDownloadURL();
+
+          EasyLoading.showSuccess('Upload Successful!');
+
+          if (mounted) {
+            setState(() {
+              image = bytesFromPicker;
+              profilePicture = url.toString();
+            });
+          }
+        }
       } on firebase_core.FirebaseException catch (e) {
         EasyLoading.dismiss();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              e.code.toString(),
-            ),
+            content: Text('Error uploading file: ${e.message ?? e.code}'),
+          ),
+        );
+      } catch (e) {
+        EasyLoading.dismiss();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('An unexpected error occurred: $e'),
           ),
         );
       }
     }
   }
+
 
   List<String> categories = [
     'Select Business Category',
@@ -345,15 +364,15 @@ class _ProfileSetUpState extends State<ProfileSetUp> {
                                           ),
                                           const SizedBox(height: 10.0),
                                           ///_____GSt___________________________________________________
-                                          // TextFormField(
-                                          //   controller: gstNumberController,
-                                          //   decoration: InputDecoration(
-                                          //     border: const OutlineInputBorder(),
-                                          //     labelText: lang.S.of(context).gstNumber,
-                                          //     hintText: lang.S.of(context).enterGstNumber,
-                                          //   ),
-                                          // ),
-                                          // const SizedBox(height: 10.0),
+                                          TextFormField(
+                                            controller: gstNumberController,
+                                            decoration: InputDecoration(
+                                              border: const OutlineInputBorder(),
+                                              labelText: lang.S.of(context).gstNumber,
+                                              hintText: lang.S.of(context).enterGstNumber,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10.0),
                                           ///________Address_______________________________
                                           TextFormField(
                                             controller: addressController,
@@ -365,115 +384,125 @@ class _ProfileSetUpState extends State<ProfileSetUp> {
                                           ),
                                           const SizedBox(height: 10.0),
                                           ///_________City_____________________________________
-                                          // TextFormField(
-                                          //   controller: cityController,
-                                          //   decoration: InputDecoration(
-                                          //     border: const OutlineInputBorder(),
-                                          //     labelText: lang.S.of(context).cityPinCode,
-                                          //     hintText: lang.S.of(context).enterYourCityPinCode,
-                                          //   ),
-                                          // ),
-                                          // const SizedBox(height: 10.0),
-                                          // Row(
-                                          //   children: [
-                                          //     Expanded(
-                                          //       child: TextFormField(
-                                          //         controller: stateController,
-                                          //         decoration: InputDecoration(
-                                          //           border: const OutlineInputBorder(),
-                                          //           labelText: lang.S.of(context).state,
-                                          //           hintText: lang.S.of(context).enterYourState,
-                                          //         ),
-                                          //       ),
-                                          //     ),
-                                          //     const SizedBox(width: 10),
-                                          //     Expanded(
-                                          //       child: TextFormField(
-                                          //         controller: zipController,
-                                          //         decoration: InputDecoration(
-                                          //           border: const OutlineInputBorder(),
-                                          //           labelText: lang.S.of(context).zip,
-                                          //           hintText: lang.S.of(context).enterYourZip,
-                                          //         ),
-                                          //       ),
-                                          //     )
-                                          //   ],
-                                          // ),
-                                          // const SizedBox(height: 10.0),
-                                          // Text(lang.S.of(context).bankDetails, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                          // const SizedBox(height: 10.0),
-                                          //
-                                          // ///_______Bank_NAME_AND_BRANCH_NAME_____________________________
-                                          // Row(
-                                          //   children: [
-                                          //     ///________Bank_Name_____________________________
-                                          //     Expanded(
-                                          //       child: TextFormField(
-                                          //         controller: bankNameController,
-                                          //         decoration: InputDecoration(
-                                          //           border: const OutlineInputBorder(),
-                                          //           labelText: lang.S.of(context).bankName,
-                                          //           hintText: lang.S.of(context).enterYourBankName,
-                                          //         ),
-                                          //       ),
-                                          //     ),
-                                          //     const SizedBox(width: 10),
-                                          //
-                                          //     ///___________Branch_Name___________________________
-                                          //     Expanded(
-                                          //       child: TextFormField(
-                                          //         controller: bankBranchNameController,
-                                          //         decoration: InputDecoration(
-                                          //           border: const OutlineInputBorder(),
-                                          //           labelText: lang.S.of(context).branchName,
-                                          //           hintText: lang.S.of(context).enterYourBranchName,
-                                          //         ),
-                                          //       ),
-                                          //     )
-                                          //   ],
-                                          // ),
-                                          // const SizedBox(height: 10.0),
-                                          //
-                                          // ///_______Bank_AC_Number_&_IFSC NUMBER_____________________________
-                                          // Row(
-                                          //   children: [
-                                          //     ///________Bank_AC_Number_____________________________
-                                          //     Expanded(
-                                          //       child: TextFormField(
-                                          //         controller: bankAccountNumberController,
-                                          //         decoration: InputDecoration(
-                                          //           border: const OutlineInputBorder(),
-                                          //           labelText: lang.S.of(context).bankAccountNumber,
-                                          //           hintText: lang.S.of(context).enterYourBankAccountNumber,
-                                          //         ),
-                                          //       ),
-                                          //     ),
-                                          //     const SizedBox(width: 10),
-                                          //
-                                          //     ///___________IFSC NUMBER___________________________
-                                          //     Expanded(
-                                          //       child: TextFormField(
-                                          //         controller: bankIFSCController,
-                                          //         decoration: InputDecoration(
-                                          //           border: const OutlineInputBorder(),
-                                          //           labelText: lang.S.of(context).ifsc,
-                                          //           hintText: lang.S.of(context).enterYourIfscNumber,
-                                          //         ),
-                                          //       ),
-                                          //     )
-                                          //   ],
-                                          // ),
-                                          // const SizedBox(height: 10.0),
-                                          //
-                                          // ///________T&C______________________
-                                          // TextFormField(
-                                          //   controller: tncController,
-                                          //   decoration: InputDecoration(
-                                          //     border: const OutlineInputBorder(),
-                                          //     labelText: lang.S.of(context).tc,
-                                          //     hintText: lang.S.of(context).enterYourBanktc,
-                                          //   ),
-                                          // ),
+                                          TextFormField(
+                                            controller: cityController,
+                                            decoration: InputDecoration(
+                                              border: const OutlineInputBorder(),
+                                              labelText: lang.S.of(context).cityPinCode,
+                                              hintText: lang.S.of(context).enterYourCityPinCode,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10.0),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: TextFormField(
+                                                  controller: stateController,
+                                                  decoration: InputDecoration(
+                                                    border: const OutlineInputBorder(),
+                                                    labelText: lang.S.of(context).state,
+                                                    hintText: lang.S.of(context).enterYourState,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: TextFormField(
+                                                  controller: zipController,
+                                                  decoration: InputDecoration(
+                                                    border: const OutlineInputBorder(),
+                                                    labelText: lang.S.of(context).zip,
+                                                    hintText: lang.S.of(context).enterYourZip,
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          ///_____Opening Balance___________________________________________________
+                                          TextFormField(
+                                            controller: shopOpeningBalanceController,
+                                            decoration: InputDecoration(
+                                              border: const OutlineInputBorder(),
+                                              labelText: lang.S.of(context).openingBalance,
+                                              hintText: lang.S.of(context).enteropeningBalance,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10.0),
+                                          Text(lang.S.of(context).bankDetails, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                          const SizedBox(height: 10.0),
+
+                                          ///_______Bank_NAME_AND_BRANCH_NAME_____________________________
+                                          Row(
+                                            children: [
+                                              ///________Bank_Name_____________________________
+                                              Expanded(
+                                                child: TextFormField(
+                                                  controller: bankNameController,
+                                                  decoration: InputDecoration(
+                                                    border: const OutlineInputBorder(),
+                                                    labelText: lang.S.of(context).bankName,
+                                                    hintText: lang.S.of(context).enterYourBankName,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+
+                                              ///___________Branch_Name___________________________
+                                              Expanded(
+                                                child: TextFormField(
+                                                  controller: bankBranchNameController,
+                                                  decoration: InputDecoration(
+                                                    border: const OutlineInputBorder(),
+                                                    labelText: lang.S.of(context).branchName,
+                                                    hintText: lang.S.of(context).enterYourBranchName,
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10.0),
+
+                                          ///_______Bank_AC_Number_&_IFSC NUMBER_____________________________
+                                          Row(
+                                            children: [
+                                              ///________Bank_AC_Number_____________________________
+                                              Expanded(
+                                                child: TextFormField(
+                                                  controller: bankAccountNumberController,
+                                                  decoration: InputDecoration(
+                                                    border: const OutlineInputBorder(),
+                                                    labelText: lang.S.of(context).bankAccountNumber,
+                                                    hintText: lang.S.of(context).enterYourBankAccountNumber,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+
+                                              ///___________IFSC NUMBER___________________________
+                                              Expanded(
+                                                child: TextFormField(
+                                                  controller: bankIFSCController,
+                                                  decoration: InputDecoration(
+                                                    border: const OutlineInputBorder(),
+                                                    labelText: lang.S.of(context).ifsc,
+                                                    hintText: lang.S.of(context).enterYourIfscNumber,
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10.0),
+
+                                          ///________T&C______________________
+                                          TextFormField(
+                                            controller: tncController,
+                                            decoration: InputDecoration(
+                                              border: const OutlineInputBorder(),
+                                              labelText: lang.S.of(context).tc,
+                                              hintText: lang.S.of(context).enterYourBanktc,
+                                            ),
+                                          ),
                                           const SizedBox(height: 10.0),
                                         ],
                                       )),
@@ -512,24 +541,7 @@ class _ProfileSetUpState extends State<ProfileSetUp> {
                                         await personalInformationRef.set(personalInformation.toJson());
                       
                                         EasyLoading.showSuccess('Added Successfully', duration: const Duration(milliseconds: 1000));
-                      
-                                        SellerInfoModel sellerInfoModel = SellerInfoModel(
-                                          businessCategory: dropdownValue,
-                                          companyName: companyNameController.text,
-                                          phoneNumber: phoneNumberController.text,
-                                          countryName: addressController.text,
-                                          language: selectedLanguage,
-                                          pictureUrl: profilePicture,
-                                          userID: constUserId,
-                                          email: '',
-                                          subscriptionDate: DateTime.now().toString(),
-                                          subscriptionName: 'Free',
-                                          subscriptionMethod: 'Not Provided',
-                                        );
-                                        await FirebaseDatabase.instance.ref().child('Admin Panel').child('Seller List').push().set(sellerInfoModel.toJson());
-                      
-                                        EasyLoading.showSuccess('Added Successfully', duration: const Duration(milliseconds: 1000));
-                      
+
                                         ref.refresh(profileDetailsProvider);
                                         Navigator.pushNamed(context, MtHomeScreen.route);
                                       } catch (e) {
